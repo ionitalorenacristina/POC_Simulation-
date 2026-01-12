@@ -1,5 +1,5 @@
-# POC_Simulation-
-Entity Resolution and Data analysis and QC
+# POC_Simulation - Entity Resolution and Data Analysis & QC
+
 ## Part 1: Entity Resolution
 
 The goal of this step was to resolve each input company to a real-world entity using the candidate matches provided by the client’s database. The process included the following steps:
