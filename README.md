@@ -9,14 +9,14 @@ The goal of this step was to resolve each input company to a real-world entity u
 The goal of this step was to resolve each input company to a real-world entity using the candidate matches provided by the client’s database. The process included the following steps:
 
 1. **Data Simplification**  
-    Created two auxiliary columns: `input_simplified` and `db_name`, removing spaces, punctuation, slashes, and converting all text to uppercase to standardize the names.  
+    Created two auxiliary columns: `input_simplified` and `db_name`, removing spaces, punctuation, slashes, and converting all text to uppercase to standardize the company names.  
 
 2. **Name Matching**  
     Compared simplified names using substring search; assigned `1` if there was a match, `0` otherwise.  
 
 3. **Country and City Matching**  
     Country: exact match → `Yes` / `No`  
-    City: substring match to account for administrative variants (e.g., 'Augsburg municipality' vs 'Augsburg') → `Yes` / `No`  
+    City: substring match to account for administrative variants (e.g. 'Augsburg municipality' vs 'Augsburg') = `Yes` / `No`  
 
 4. **Match Level Determination**  
     High: name_match = 1 AND country = Yes AND city = Yes  
@@ -28,8 +28,8 @@ The goal of this step was to resolve each input company to a real-world entity u
      ```
 
 5. **Chosen ID Assignment and Match Decision**  
-    High match → `Chosen_ID` assigned directly from Veridion ID  
-    Medium match → further checked city/country variants; valid matches assigned ID, flagged as `Match Found`  
+    High match = `Chosen_ID` assigned directly from Veridion ID  
+    Medium match = further checked city/country variants; valid matches assigned ID, flagged as `Match Found`  
     Low match or country mismatch → automatically `No Match`  
     Match Found / No Match column formula:  
      ```excel
@@ -38,12 +38,12 @@ The goal of this step was to resolve each input company to a real-world entity u
 
 6. **Duplicate Handling**  
     Duplicate `Chosen_ID`s were reviewed; only correct matches were kept.  
-    After removing duplicates, the final counts were: 318 `Match Found` (and 333 before removing)  and 2801 `No Match`.
+    After removing duplicates, the final counts were: 318 `Match Found` (and 333 before removing) and 2801 `No Match`.
 
 7. **Summary**  
     The majority of High match candidates were automatically resolved.  
     Medium matches required additional checks for city variations.  
-   Low matches were excluded to prevent incorrect or unreliable matches.
+    Low matches were excluded to prevent incorrect matches.
     Administrative city variants were handled as soft matches to minimize manual review.
 
 ---
@@ -62,13 +62,25 @@ The goal of this step was to resolve each input company to a real-world entity u
 ---
 
 **Notes:**  
-- All decisions were made following clear, consistent rules to allow scaling the process to larger datasets.  
-- The workflow ensures that only validated IDs are used for further analysis in Part 2 of the POC.  
-- Medium matches may require additional manual review for ambiguous city variations.
+ Medium matches may require additional manual review for ambiguous city variations.
+ I only use validated IDs for the next part of the analysis.
 
-7. **Summary**  
-    The majority of High match candidates were automatically resolved.  
-    Medium matches required additional checks for city variations.  
-    Low matches were excluded to prevent incorrect matches.
-    Administrative city variants were handled as soft matches to minimize manual review.
+## Part 2: Data analysis and QC
+
+All rows with a Chosen_ID already have a verified Veridion ID, country and city, since these were validated during the entity resolution process. For the remaining rows with no match, we will focus on analyzing them for potential patterns or inconsistencies.
+During the QC process, I observed missing values in the dataset for rows without a Chosen_ID (No Match):
+
+- 254 records from the database had no country specified compared to 53 records from the input.  
+- 429 records from the database had no city specified compared to 494 records from the input.  
+- All missing values occur only within the No Match records.  
+
+During data quality checks, several anomalies were observed across all records in the dataset, regardless of whether a Chosen_ID was assigned:
+
+- `revenue` contained text entries instead of numeric values in some records.  
+- `employee_count` had unexpected values such as links or non-numeric text.  
+- `num_locations` contained text entries that appear to be domain names or other non-numeric information.  
+- `latitude` and `longitude` also contained text entries instead of numeric coordinates.  
+- Some street numbers were incorrectly interpreted as dates by Excel (e.g., "5-2" = "5-Feb").  
+- Missing or incomplete values were observed in many fields, including postal codes, emails, website URLs, and other company attributes.  
+- Text fields like company names and descriptions occasionally contained special characters or were missing so these were noted but not corrected.  
 
