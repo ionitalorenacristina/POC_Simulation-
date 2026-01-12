@@ -84,3 +84,5 @@ During data quality checks, several anomalies were observed across all records i
 - Missing or incomplete values were observed in many fields, including postal codes, emails, website URLs, and other company attributes.  
 - Text fields like company names and descriptions occasionally contained special characters or were missing so these were noted but not corrected.  
 
+[Download the verified CSV file](presales_data_sample_verified.csv)
+
